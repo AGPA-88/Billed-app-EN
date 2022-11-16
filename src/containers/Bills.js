@@ -10,7 +10,7 @@ export default class {
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`)
     if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
-    if (iconEye) iconEye.forEach(icon => {
+    if (iconEye.length > 0) iconEye.forEach(icon => {
       icon.addEventListener('click', (e) => this.handleClickIconEye(icon))
     })
     new Logout({ document, localStorage, onNavigate })
@@ -28,6 +28,7 @@ export default class {
   }
 
   // no need to cover this function by tests
+  /* istanbul ignore next */
   getBills = () => {
     const userEmail = localStorage.getItem('user') ?
       JSON.parse(localStorage.getItem('user')).email : ""
