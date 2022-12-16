@@ -10,7 +10,9 @@ describe("Given I am connected as an employee", () => {
       document.body.innerHTML = html
       //to-do write assertion
       
-      localStorage.__proto__.getItem=jest.fn((x) => '{"type":"Employee","email":"johndoe@email.com","password":"azerty","status":"connected"}')
+      localStorage.__proto__.getItem=jest.fn(
+        (x) => '{"type":"Employee","email":"johndoe@email.com","password":"azerty","status":"connected"}'
+        )
 
       const myNewBill = new NewBill({document: document, localStorage: localStorage});
       const formNewBill = document.querySelector(`form[data-testid="form-new-bill"]`)
@@ -19,16 +21,68 @@ describe("Given I am connected as an employee", () => {
       expect(myNewBill.onNavigate).toHaveBeenCalled();
     })
   })
-  test("Change a file", () => {
+  
+  test("Test uploading wrong file type", () => {
+    const html = NewBillUI();
+    document.body.innerHTML = html;
+    
+    const fileInput = document.querySelector(`input[data-testid="file"]`);
+    let file = new File(["testFile"], "testFile.txt", {type: "image/txt"})
+    
+    const newBill = new NewBill({document: document, onNavigate: null, firestore: null})
+    window.alert = jest.fn(x => {return x});
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable:true
+    })
+    
+    const fileTrue = new File(['testFile'], 'testFile.txt', {type: 'image/txt'})
+    fireEvent.change(fileInput, { target: { files: [fileTrue] } })
+    
+    expect(window.alert).toHaveBeenCalled();
+  });
+
+
+  test("Test handleChangeFile function", () => {
+    const html = NewBillUI();
+    document.body.innerHTML = html;
+
+    const newBill = new NewBill({document, onNavigate: null, firestore: null})
+      
+    const fileInput = screen.getByTestId("file");
+    const handleChangeFile = jest.fn(newBill.handleChangeFile);
+    fileInput.addEventListener("change", handleChangeFile);
+
+    const fileTrue = new File(['testFile'], 'testFile.jpg', {type: 'image/jpg'})
+    fireEvent.change(fileInput, { target: { files: [fileTrue] } })
+    
+    expect(handleChangeFile).toHaveBeenCalled();
+  });
+
+  test("Post NewBill integration test", () => {
+    // Set up the test environment
     const html = NewBillUI()
     document.body.innerHTML = html
-    const toto = new NewBill({document})
+    localStorage.__proto__.getItem = jest.fn(
+      (x) => '{"type":"Employee","email":"johndoe@email.com","password":"azerty","status":"connected"}'
+    )
 
-    //Creation of fake file to upload
-    let file = new File(['(⌐□_□)'], 'test-img.png', { type: 'image/png' });
-    //Upload of the file into the input
-    Object.defineProperty(document.querySelector(`input[data-testid="file"]`), 'files', {
-      value: [file]
+    // Create a new instance of the NewBill class
+    const newBill = new NewBill({
+      document: document,
+      localStorage: localStorage,
+      firestore: null,
+      onNavigate: jest.fn()
     })
+
+    // Simulate a POST request to the form
+    const form = document.querySelector(`form[data-testid="form-new-bill"]`)
+    fireEvent.submit(form)
+
+    // Make assertions about the behavior of the NewBill class
+    expect(newBill.onNavigate).toHaveBeenCalled()
+    expect(newBill.onNavigate).toHaveBeenCalledWith("#employee/bills")
+
   })
+
 })

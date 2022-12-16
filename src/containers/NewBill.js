@@ -16,10 +16,25 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
+    console.log('file changed')
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
+    const filePath = file.name.split(/\\/g)
+
+    console.log("filePath", filePath);
+    console.log(file);
+    console.log(file.name);
+    console.log(file.type);
+
     const fileName = filePath[filePath.length-1]
-    this.firestore
+    
+    if (!getExtention(fileName).includes(".png") && !getExtention(fileName).includes(".jpg") && !getExtention(fileName).includes(".jpeg")){
+      alert(getExtention(fileName) + " is not authorized");
+      this.document.querySelector(`input[data-testid="file"]`).value = "";
+      return -1
+    }
+  /* istanbul ignore next */
+    if (this.firestore){
+      this.firestore
       .storage
       .ref(`justificatifs/${fileName}`)
       .put(file)
@@ -28,6 +43,7 @@ export default class NewBill {
         this.fileUrl = url
         this.fileName = fileName
       })
+    }
   }
   handleSubmit = e => {
     e.preventDefault()
@@ -62,4 +78,10 @@ export default class NewBill {
       .catch(error => error)
     }
   }
+}
+
+function getExtention(fileName){
+  var i = fileName.lastIndexOf('.');
+  if(i === -1 ) return false;
+  return fileName.slice(i)
 }
