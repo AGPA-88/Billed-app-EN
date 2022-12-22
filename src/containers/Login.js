@@ -50,6 +50,7 @@ export default class Login {
   }
 
   // no need to cover this function by tests
+  /* istanbul ignore next */
   checkIfUserExists = (user) => {
     if (this.firestore) {
       this.firestore
@@ -70,6 +71,7 @@ export default class Login {
   }
 
   // no need to cover this function by tests
+  /* istanbul ignore next */
   createUser = (user) => {
     if (this.firestore) {
       this.firestore
