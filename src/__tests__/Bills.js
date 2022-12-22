@@ -48,5 +48,16 @@ describe("Given I am connected as an employee", () => {
       fireEvent.click(buttonNewBill);
       expect(myBills.onNavigate).toHaveBeenCalled();
     })
+
+    test("If it's loading the loading page is displayed", () => {
+      const html = BillsUI({ data: [], loading: "loading"})
+      document.body.innerHTML = html
+      expect((document.querySelector("#loading"))).toBeTruthy();
+    })
+    test("If it's on error, the error page displays", () => {
+      const html = BillsUI({ data: [], error: "error"})
+      document.body.innerHTML = html
+      expect(screen.getByTestId("error-message")).toBeTruthy();
+    })
   })
 })
