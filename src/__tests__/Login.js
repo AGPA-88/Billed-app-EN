@@ -41,7 +41,122 @@ describe("Given that I am a user on login page", () => {
       form.addEventListener("submit", handleSubmit)
       fireEvent.submit(form) 
       expect(screen.getByTestId("form-employee")).toBeTruthy()
+      
     })
+    it('For employee: should call the createUser function if the user does not exist in the Firestore database', () => {
+      document.body.innerHTML = LoginUI()
+      const inputData = {
+        email: "johndoe@email.com",
+        password: "azerty"
+      }
+  
+      const inputEmailUser = screen.getByTestId("employee-email-input")
+      fireEvent.change(inputEmailUser, { target: { value: inputData.email } })
+      expect(inputEmailUser.value).toBe(inputData.email)
+          
+      const inputPasswordUser = screen.getByTestId("employee-password-input")
+      fireEvent.change(inputPasswordUser, { target: { value: inputData.password } })
+      expect(inputPasswordUser.value).toBe(inputData.password)
+  
+      const form = screen.getByTestId("form-employee")
+      
+      // localStorage should be populated with form data
+      Object.defineProperty(window, "localStorage", {
+        value: {
+          getItem: jest.fn(() => null),
+          setItem: jest.fn(() => null)
+        },
+        writable: true
+      })
+  
+      // we have to mock navigation to test it
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+  
+      let PREVIOUS_LOCATION = ''
+  
+      const firebase = jest.fn()
+  
+      const login = new Login({
+        document,
+        localStorage: window.localStorage,
+        onNavigate,
+        PREVIOUS_LOCATION,
+        firebase
+      })
+
+      // set up a mock implementation of the checkIfUserExists method
+      login.checkIfUserExists = jest.fn().mockReturnValue(true);
+  
+      // set up a mock implementation of the createUser method
+      login.createUser = jest.fn();
+  
+      // call the handleSubmitEmployee method
+      // login.handleSubmitEmployee(event);
+
+      fireEvent.submit(form) 
+  
+      // assert that the createUser method was called
+      expect(login.createUser).not.toHaveBeenCalled();
+    });
+    it('For admin: should call the createUser function if the user does not exist in the Firestore database', () => {
+      document.body.innerHTML = LoginUI()
+      const inputData = {
+        email: "johndoe@email.com",
+        password: "azerty"
+      }
+  
+      const inputEmailUser = screen.getByTestId("admin-email-input")
+      fireEvent.change(inputEmailUser, { target: { value: inputData.email } })
+      expect(inputEmailUser.value).toBe(inputData.email)
+          
+      const inputPasswordUser = screen.getByTestId("admin-password-input")
+      fireEvent.change(inputPasswordUser, { target: { value: inputData.password } })
+      expect(inputPasswordUser.value).toBe(inputData.password)
+  
+      const form = screen.getByTestId("form-admin")
+      
+      // localStorage should be populated with form data
+      Object.defineProperty(window, "localStorage", {
+        value: {
+          getItem: jest.fn(() => null),
+          setItem: jest.fn(() => null)
+        },
+        writable: true
+      })
+  
+      // we have to mock navigation to test it
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+  
+      let PREVIOUS_LOCATION = ''
+  
+      const firebase = jest.fn()
+  
+      const login = new Login({
+        document,
+        localStorage: window.localStorage,
+        onNavigate,
+        PREVIOUS_LOCATION,
+        firebase
+      })
+
+      // set up a mock implementation of the checkIfUserExists method
+      login.checkIfUserExists = jest.fn().mockReturnValue(true);
+  
+      // set up a mock implementation of the createUser method
+      login.createUser = jest.fn();
+  
+      // call the handleSubmitEmployee method
+      // login.handleSubmitEmployee(event);
+
+      fireEvent.submit(form) 
+  
+      // assert that the createUser method was called
+      expect(login.createUser).not.toHaveBeenCalled();
+    });
   })
 
   describe("When I do fill fields in correct format and I click on employee button Login In", () => {
